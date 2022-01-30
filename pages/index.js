@@ -1,4 +1,5 @@
 import { Box, Button, Text, TextField, Image } from "@skynexui/components";
+import React from "react";
 import appConfig from "../config.json";
 
 function GlobalStyle() {
@@ -62,7 +63,8 @@ function Titulo(props) {
 // export default HomePage
 
 export default function PaginaInicial() {
-  const username = "rohuldson";
+  //const username = "franklinribe";
+  const [username, setUsername] = React.useState("rohuldson");
 
   return (
     <>
@@ -123,17 +125,37 @@ export default function PaginaInicial() {
               {appConfig.name}
             </Text>
 
-            <TextField
-              fullWidth
-              textFieldColors={{
-                neutral: {
-                  textColor: appConfig.theme.colors.neutrals[200],
-                  mainColor: appConfig.theme.colors.neutrals[900],
-                  mainColorHighlight: appConfig.theme.colors.primary[500],
-                  backgroundColor: appConfig.theme.colors.neutrals[800],
-                },
+            {/*       <input
+              type="text"
+              value={username}
+              onChange={function (event) {
+                console.log("usuario digitando:", event.target.value);
+                // Onde está o valor?
+                const value = event.target.value;
+                // Trocar valor digitado no campo
+
+                setUsername(value);
               }}
             />
+ */}
+            {
+              <TextField
+                value={username}
+                onChange={function (event) {
+                  const value = event.target.value;
+                  setUsername(value);
+                }}
+                fullWidth
+                textFieldColors={{
+                  neutral: {
+                    textColor: appConfig.theme.colors.neutrals[200],
+                    mainColor: appConfig.theme.colors.neutrals[900],
+                    mainColorHighlight: appConfig.theme.colors.primary[500],
+                    backgroundColor: appConfig.theme.colors.neutrals[800],
+                  },
+                }}
+              />
+            }
             <Button
               type="submit"
               label="Entrar"
