@@ -77,7 +77,7 @@ export default function PaginaInicial() {
             onSubmit={function (eventos) {
               console.log("enviado");
               eventos.preventDefault();
-              roteamento.push("/chat");
+              roteamento.push(`/chat?username=${username}`);
             }}
             styleSheet={{
               display: "flex",

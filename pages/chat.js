@@ -2,6 +2,8 @@ import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import React from "react";
 import appConfig from "../config.json";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/router";
+import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
 
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0Mzc0OTAxMywiZXhwIjoxOTU5MzI1MDEzfQ.6bzYD_vZc9UdXDVHSoBYkB4tjtBfb-OzD6ZLleoZnPc";
@@ -9,9 +11,20 @@ const SUPABASE_URL = "https://mczvmgwuqccqldktinnr.supabase.co";
 
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-export default function ChatPage() {
-  const [mensagem, setMensagem] = React.useState("");
+function escutaMensagensEmTempoReal(addMensagem) {
+  return supabaseClient
+    .from("mensagens")
+    .on("INSERT", (respostaLive) => {
+      /* sendSlackAlert() */
+      addMensagem(respostaLive.new);
+    })
+    .subscribe();
+}
 
+export default function ChatPage() {
+  const roteamento = useRouter();
+  const usuarioLogado = roteamento.query.username;
+  const [mensagem, setMensagem] = React.useState("");
   const [listaMensagem, setListagem] = React.useState([]);
 
   React.useEffect(() => {
@@ -21,10 +34,18 @@ export default function ChatPage() {
       .select("*")
       .order("id", { ascending: false })
       .then(({ data }) => {
-        console.log("dados:", data);
+        //console.log("dados da consulta:", data);
 
         setListagem(data);
       });
+
+    escutaMensagensEmTempoReal((novaMensagem) => {
+      console.log("nova msg", novaMensagem);
+
+      setListagem((valorAtuaDaLista) => {
+        return [novaMensagem, ...valorAtuaDaLista];
+      });
+    });
   }, []);
 
   // Sua lógica vai aqui
@@ -48,7 +69,7 @@ export default function ChatPage() {
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
       //id: listaMensagem.length + 1,
-      de: "rohuldson",
+      de: usuarioLogado,
       texto: novaMensagem,
     };
 
@@ -57,7 +78,6 @@ export default function ChatPage() {
       .insert([mensagem])
       .then(({ data }) => {
         console.log("Criando msg:", data);
-        setListagem([data[0], ...listaMensagem]);
       });
 
     setMensagem("");
@@ -146,6 +166,17 @@ export default function ChatPage() {
                 color: appConfig.theme.colors.neutrals[200],
               }}
             />
+
+            {/* Callback */}
+            <ButtonSendSticker
+              onStickerClick={(sticker) => {
+                /*   console.log(
+                  "[USANDO O COMPONENTE]salva esse sticker no banco",
+                  sticker
+                ); */
+                handleNovaMensagem(`:sticker:${sticker}`);
+              }}
+            />
           </Box>
         </Box>
       </Box>
@@ -178,7 +209,7 @@ function Header() {
 }
 
 function MessageList(props) {
-  console.log(props);
+  // console.log(props);
   return (
     <Box
       tag="ul"
@@ -218,7 +249,7 @@ function MessageList(props) {
                   display: "inline-block",
                   marginRight: "8px",
                 }}
-                src={`https://github.com/rohuldson.png`}
+                src={`https://github.com/${mensagem.de}.png`}
               />
               {/* <Text tag="strong">{mensagem.de}</Text> */}
               <Text tag="strong">{mensagem.de}</Text>
@@ -233,7 +264,13 @@ function MessageList(props) {
                 {new Date().toLocaleDateString()}
               </Text>
             </Box>
-            {mensagem.texto}
+            {/*  Condicional: {mensagem.texto.startsWith(":sticker:").toString()} */}
+            {mensagem.texto.startsWith(":sticker:") ? (
+              <Image src={mensagem.texto.replace(":sticker:", "")} />
+            ) : (
+              mensagem.texto
+            )}
+            {/*   {mensagem.texto} */}
           </Text>
         );
       })}
