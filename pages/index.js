@@ -46,7 +46,7 @@ export default function PaginaInicial() {
           justifyContent: "center",
           backgroundColor: appConfig.theme.colors.primary[200],
           backgroundImage:
-            "url(https://virtualbackgrounds.site/wp-content/uploads/2020/07/doctor-stranges-window-of-the-worlds-1536x864.jpg)",
+            "url(https://www.whats-on-netflix.com/wp-content/uploads/2017/12/is-the-lord-of-the-rings-trilogy-on-netflix.jpg)",
 
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
@@ -89,7 +89,7 @@ export default function PaginaInicial() {
               marginBottom: "32px",
             }}
           >
-            <Titulo tag="h2">Boas vindas de volta!</Titulo>
+            <Titulo tag="h2">Show ter você por aqui!</Titulo>
             <Text
               variant="body3"
               styleSheet={{
